@@ -1,4 +1,4 @@
-package com.mailparser.mailextract.enums;
+package common.enums;
 
 public enum HtmlState {
         UNCHECKED,

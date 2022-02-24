@@ -1,4 +1,4 @@
-package com.mailparser.mailextract.patterns;
+package common.patterns;
 
 import java.util.regex.Pattern;
 

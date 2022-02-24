@@ -1,6 +1,5 @@
-package com.mailparser.mailextract.repository;
+package common.repository;
 
-import com.mailparser.mailextract.entity.UrlDataEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

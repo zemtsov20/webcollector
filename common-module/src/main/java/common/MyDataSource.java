@@ -1,4 +1,4 @@
-package com.mailparser.mailextract;
+package common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbcp2.BasicDataSource;

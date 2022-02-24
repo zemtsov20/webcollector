@@ -1,4 +1,4 @@
-package com.mailparser.mailextract.schedule;
+package htmlextract.schedule;
 
 import com.mailparser.mailextract.beans.GetMailsFromHtmlBean;
 import com.mailparser.mailextract.enums.HtmlState;

@@ -1,55 +1,7 @@
-plugins {
-	id 'org.springframework.boot' version '2.6.3'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
-	id 'java-library-distribution'
-}
 
 group = 'com.mailparser'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-targetCompatibility = 11
 
 repositories {
 	mavenCentral()
-}
-
-dependencies {
-	compile 'org.springframework.boot:spring-boot-starter:2.6.2'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.2'
-	compile 'org.projectlombok:lombok:1.18.20'
-	annotationProcessor 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql:42.3.1'
-	compile 'commons-io:commons-io:2.11.0'
-	implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
-	implementation 'org.postgresql:postgresql:42.1.4'
-	testCompile project(':htmlextract')
-}
-
-distZip.shouldRunAfter(build)
-
-jar {
-	// Keep jar clean:
-	exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
-
-	manifest {
-		attributes 'Main-Class': 'com.mailparser.mailextract.MailextractApplication',
-				'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
-	}
-	// How-to add class path:
-	//     https://stackoverflow.com/questions/22659463/add-classpath-in-manifest-using-gradle
-	//     https://gist.github.com/simon04/6865179
-}
-
-//jar {
-//	manifest {
-//		attributes 'Main-Class': 'com.mailparser.mailextract.MailextractApplication'
-//	}
-//	from {
-//		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-//	}
-//}
-
-tasks.named('test') {
-	//useJUnitPlatform()
 }

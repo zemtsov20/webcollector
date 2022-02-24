@@ -1,4 +1,5 @@
 rootProject.name = 'mailextract'
-include 'htmlextract'
-include 'mailextract-common'
+include 'common-module'
+include 'parser-module'
+include 'html-extractor-module'
 
