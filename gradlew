@@ -1,5 +1,14 @@
 #!/bin/sh
 
+JAR=mailextract-$(pwd | sed 's/[^\/]*\///g').jar
+
+DB_USER=admin
+DB_PASS=mD8qH
+DB_NAME=maildb
+
+d=$(date +%F)
+
+java -Dserver.port=22000 -Ddb.user=$DB_USER -Ddb.pass=$DB_PASS -Ddb.name=$DB_NAME -jar $JAR 2>&1 | tee -a worker-$d.log
 #
 # Copyright © 2015-2021 the original authors.
 #

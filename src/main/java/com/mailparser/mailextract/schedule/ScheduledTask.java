@@ -1,6 +1,6 @@
 package com.mailparser.mailextract.schedule;
 
-import com.mailparser.mailextract.beans.GetEmailsFromHtmlBean;
+import com.mailparser.mailextract.beans.GetMailsFromHtmlBean;
 import com.mailparser.mailextract.enums.HtmlState;
 import com.mailparser.mailextract.repository.UrlDataEntityRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,19 +13,24 @@ import org.springframework.stereotype.Component;
 public class ScheduledTask {
 
     @Autowired
-    private GetEmailsFromHtmlBean getMailsFromHtmlBean;
+    private GetMailsFromHtmlBean getMailsFromHtmlBean;
     @Autowired
     private UrlDataEntityRepository urlDataEntityRepository;
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedDelay = 1000)
     public void getEmails() {
-        var html = urlDataEntityRepository.findFirstUnchecked().get(0);
-        if(html.getText() != null) {
-            //html.setState(HtmlState.CHECKING);
-            html.setEmailsOnPage(getMailsFromHtmlBean.emailsFromPage(html.getText()));
-            html.setState(HtmlState.CHECKED);
-            // make it updating, not saving new
-            urlDataEntityRepository.save(html);
+        var htmlList = urlDataEntityRepository.findUnchecked();
+        if(!htmlList.isEmpty()) {
+            htmlList.forEach(html -> {
+                if(html.getText() != null) {
+                    //html.setState(HtmlState.CHECKING);
+                    html.setEmailsOnPage(getMailsFromHtmlBean.emailsFromPage(html.getText()));
+                    html.setState(HtmlState.CHECKED);
+                    // make it updating, not saving new
+                    urlDataEntityRepository.save(html);
+                }
+            });
         }
+
     }
 }

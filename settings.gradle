@@ -1,1 +1,4 @@
 rootProject.name = 'mailextract'
+include 'htmlextract'
+include 'mailextract-common'
+

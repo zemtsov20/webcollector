@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 public class MailextractApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(MailextractApplication.class, args);
 	}
