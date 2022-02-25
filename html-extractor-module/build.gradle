@@ -5,7 +5,7 @@ plugins {
     id 'java-library-distribution'
 }
 
-group 'com.mailparser'
+group 'emailparser'
 version '0.0.1-SNAPSHOT'
 
 repositories {
