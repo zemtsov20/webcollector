@@ -1,5 +1,7 @@
 package emailparser;
 
+import emailparser.beans.GetMailsFromHtmlBean;
+import emailparser.schedule.ScheduledTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
