@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.3'
+    id 'org.springframework.boot' version '2.6.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'java-library-distribution'
@@ -20,15 +20,8 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql:42.3.1'
     compile 'commons-io:commons-io:2.11.0'
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
-    implementation 'org.postgresql:postgresql:42.1.4'
-    compile ':common-module'
-}
-
-group 'com.mailparser'
-version '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+    implementation 'org.postgresql:postgresql:42.3.1'
+    compile project(':common-module')
 }
 
 test {

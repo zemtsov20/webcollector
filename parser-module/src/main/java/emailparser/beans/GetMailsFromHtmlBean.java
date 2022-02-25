@@ -1,8 +1,8 @@
 package emailparser.beans;
 
 
-import com.mailparser.mailextract.patterns.Patterns;
-import com.mailparser.mailextract.repository.UrlDataEntityRepository;
+import common.patterns.Patterns;
+import common.repository.UrlDataEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
