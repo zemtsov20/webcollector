@@ -1,24 +1,23 @@
 #!/bin/bash
 
-M2_PATH=/cygdrive/c/Users/Alexey/.m2/repository/ru/surfer/
+M2_PATH=C:/Users/dima3/IdeaProjects/mailextract
 echo $M2_PATH
 
-VER=`ls -t $M2_PATH/surfer | grep -v xml | head -n 1`
+VER=0.0.1-SNAPSHOT
 echo $VER
 
 
-PROD_ROOT=/cygdrive/d/Prod
+PROD_ROOT=D:/Diploma_project
 
 mkdir $PROD_ROOT/$VER
-cp $M2_PATH/surfer-bot/$VER/surfer-bot-$VER.jar $PROD_ROOT/$VER/
-cp $M2_PATH/surfer-worker/$VER/surfer-worker-$VER.jar $PROD_ROOT/$VER/
+cp $M2_PATH/parser-module/build/libs/parser-module-$VER.jar $PROD_ROOT/$VER/
+cp $M2_PATH/html-extractor-module/build/libs/html-extractor-module-$VER.jar $PROD_ROOT/$VER/
 
 echo All copied to $PROD_ROOT/$VER !
 
-unzip -jo $PROD_ROOT/$VER/surfer-bot-$VER.jar "BOOT-INF/classes/proxies.txt" -d $PROD_ROOT/$VER
-unzip -jo $PROD_ROOT/$VER/surfer-bot-$VER.jar "BOOT-INF/classes/start-bots.sh" -d $PROD_ROOT/$VER
+unzip -jo $PROD_ROOT/$VER/html-extractor-module-$VER.jar "BOOT-INF/classes/run-extractor.sh" -d $PROD_ROOT/$VER
 
-unzip -jo $PROD_ROOT/$VER/surfer-worker-$VER.jar "BOOT-INF/classes/start-worker.sh" -d $PROD_ROOT/$VER
+unzip -jo $PROD_ROOT/$VER/surfer-worker-$VER.jar "BOOT-INF/classes/run-parser.sh" -d $PROD_ROOT/$VER
 
 chmod 744 $PROD_ROOT/$VER/*.sh
 

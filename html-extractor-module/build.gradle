@@ -27,3 +27,12 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+jar {
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+
+    manifest {
+        attributes 'Main-Class': 'htmlextract.HtmlExtractApplication',
+                'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
+    }
+}

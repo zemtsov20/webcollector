@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#JAR=parser-module-`pwd | sed 's/[^\/]*\///g'`.jar
-JAR=parser-module-0.0.1-SNAPSHOT.jar
+#JAR=html-extractor-module`pwd | sed 's/[^\/]*\///g'`.jar
+JAR=html-extractor-module-0.0.1-SNAPSHOT.jar
 #Alexey@ZOLENENOK2 /cygdrive/c/Users/Alexey/IdeaProjects/mailextract/parser-module/src/main/resources
 #$ ls
 #run-parser.sh

@@ -23,7 +23,7 @@ dependencies {
     compile 'commons-io:commons-io:2.11.0'
     implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
     implementation 'org.postgresql:postgresql:42.3.1'
-    compile project(':common-module')
+    implementation project(':common-module')
 }
 
 test {
@@ -34,7 +34,7 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 
     manifest {
-        attributes 'Main-Class': 'com.mailparser.mailextract.MailextractApplication',
+        attributes 'Main-Class': 'emailparser.EmailParserApplication',
                 'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
 }

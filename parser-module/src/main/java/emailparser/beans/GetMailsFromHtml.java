@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 
 @Component
-public class GetMailsFromHtmlBean {
+public class GetMailsFromHtml {
     @Autowired
     private UrlDataEntityRepository urlDataEntityRepository;
 
@@ -23,6 +23,7 @@ public class GetMailsFromHtmlBean {
         while (emailMatcher.find()) {
             newEmails.add(emailMatcher.group());
         }
+
         return newEmails;
     }
 }
