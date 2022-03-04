@@ -1,17 +1,16 @@
-package common.entity;
+package com.common.entity;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.ToString;
-import common.enums.HtmlState;
+import com.common.enums.HtmlState;
 
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
-@Table
+@Table(name = "url_data")
 @Data
 @ToString
 public class UrlDataEntity {
@@ -22,14 +21,14 @@ public class UrlDataEntity {
     private Long urlId;
     @Column(name="date")
     private Date urlTs;
-    // rename columns
     @NotNull
     @Column(name="state")
     private HtmlState state;
     @Column(name="text",columnDefinition="TEXT")
     private String text;
-    @ElementCollection
-    Set<String> emailsOnPage;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_id", referencedColumnName = "id")
+    private ParsedContent parsedContent;
 
     UrlDataEntity() {}
 
@@ -37,21 +36,5 @@ public class UrlDataEntity {
         urlTs = new Date();
         state = HtmlState.UNCHECKED;
         text = html;
-    }
-
-    public Long getUrlId() {
-        return urlId;
-    }
-
-    public Date getUrlTs() {
-        return urlTs;
-    }
-
-    public HtmlState getState() {
-        return state;
-    }
-
-    public String getText() {
-        return text;
     }
 }

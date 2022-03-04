@@ -5,7 +5,7 @@ plugins {
     id 'java-library-distribution'
 }
 
-group 'common'
+group 'com.webcollector'
 version '0.0.1-SNAPSHOT'
 
 repositories {

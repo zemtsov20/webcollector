@@ -1,4 +1,4 @@
-package common.entity;
+package com.common.entity;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Entity
-@Table
+@Table(name = "url")
 @Data
 @ToString
 public class UrlEntity {

@@ -1,9 +1,10 @@
-package emailparser.scheduler;
+package com.contentparser.scheduler;
 
-import common.enums.HtmlState;
-import common.repository.UrlDataEntityRepository;
+import com.common.entity.ParsedContent;
+import com.common.enums.HtmlState;
+import com.common.repository.UrlDataEntityRepository;
 
-import emailparser.beans.GetMailsFromHtml;
+import com.contentparser.beans.GetContentFromHtml;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,21 +19,21 @@ public class ScheduledTask {
             ScheduledTask.class);
 
     @Autowired
-    private GetMailsFromHtml getMailsFromHtml;
+    private GetContentFromHtml getContentFromHtml;
     @Autowired
     private UrlDataEntityRepository urlDataEntityRepository;
 
-    @Scheduled(fixedDelay = 1000)
-    public void getEmails() {
-        var htmlList = urlDataEntityRepository.findUnchecked();
+    @Scheduled(fixedDelay = 1000 * 10)
+    public void getContent() {
+        var htmlList = urlDataEntityRepository.findAll();
         logger.info("Scheduling in parser is working.");
         if(!htmlList.isEmpty()) {
             htmlList.forEach(html -> {
                 if(html.getText() != null) {
                     //html.setState(HtmlState.CHECKING);
-                    html.setEmailsOnPage(getMailsFromHtml.emailsFromPage(html.getText()));
+                    html.setParsedContent(getContentFromHtml.productFromPage(html.getText())
+                                          .orElse(new ParsedContent()));
                     html.setState(HtmlState.CHECKED);
-                    // make it updating, not saving new
                     urlDataEntityRepository.save(html);
                 }
             });

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-M2_PATH=C:/Users/dima3/IdeaProjects/mailextract
+M2_PATH=C:/Users/dima3/IdeaProjects/webcollector
 echo $M2_PATH
 
 VER=0.0.1-SNAPSHOT

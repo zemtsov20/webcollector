@@ -1,7 +1,7 @@
-package htmlextract.beans;
+package com.htmlextract.beans;
 
 
-import common.entity.UrlDataEntity;
+import com.common.entity.UrlDataEntity;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
@@ -13,12 +13,13 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class GetHtml {
 
-    public GetHtml() {}
+    public GetHtml() {
+    }
 
     public UrlDataEntity getHtmlByUrl(String url) {
-        String htmlContent = null;
+        String htmlContent = "";
         try {
-            htmlContent =  IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
+            htmlContent = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
         } catch (MalformedURLException e) {
             System.out.println("Wrong url! " + e.getMessage() + " for url " + url);
         } catch (IOException e) {
@@ -27,12 +28,4 @@ public class GetHtml {
 
         return new UrlDataEntity(htmlContent);
     }
-
-//    @PostConstruct
-//    public void afterStart(){
-////        while (true)
-//        {
-//            System.out.println("afterStart");
-//        }
-//    }
 }

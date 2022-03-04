@@ -1,4 +1,4 @@
-package common.enums;
+package com.common.enums;
 
 public enum HtmlState {
         UNCHECKED,

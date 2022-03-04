@@ -1,4 +1,4 @@
-rootProject.name = 'mailextract'
+rootProject.name = 'webcollector'
 include 'common-module'
 include 'parser-module'
 include 'html-extractor-module'

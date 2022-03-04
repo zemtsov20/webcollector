@@ -1,8 +1,9 @@
-package htmlextract.scheduler;
+package com.htmlextract.scheduler;
 
-import common.repository.UrlDataEntityRepository;
-import common.repository.UrlEntityRepository;
-import htmlextract.beans.GetHtml;
+import com.common.entity.UrlEntity;
+import com.common.repository.UrlDataEntityRepository;
+import com.common.repository.UrlEntityRepository;
+import com.htmlextract.beans.GetHtml;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,14 +24,12 @@ public class ScheduledTask {
     private GetHtml getHtml;
 
     @Scheduled(fixedDelay = 1000 * 10)
-    public void getHtml() {
+    public void getContentFromAllHtmls() {
         logger.info("Scheduling in htmlextract is working.");
-        if(urlEntityRepository.findById(2L).isPresent()) {
-            urlDataEntityRepository.
-                    save(getHtml.
-                            getHtmlByUrl(urlEntityRepository.
-                                    findById(2L).get().getUrl()));
+        for (UrlEntity urlEntity : urlEntityRepository.findAll()) {
+            urlDataEntityRepository.save(
+                    getHtml.getHtmlByUrl(urlEntity.getUrl()));
+            logger.info("Got info from " + urlEntity.getUrl());
         }
-
     }
 }

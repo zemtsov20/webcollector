@@ -5,7 +5,7 @@ plugins {
     id 'java-library-distribution'
 }
 
-group 'emailparser'
+group 'com.webcollector'
 version '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 targetCompatibility = 11
@@ -34,7 +34,7 @@ jar {
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
 
     manifest {
-        attributes 'Main-Class': 'emailparser.EmailParserApplication',
+        attributes 'Main-Class': 'emailparser.ContentParserApplication',
                 'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
 }
