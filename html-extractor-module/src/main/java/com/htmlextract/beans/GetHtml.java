@@ -1,7 +1,7 @@
 package com.htmlextract.beans;
 
 
-import com.common.entity.UrlDataEntity;
+import com.common.entity.UrlData;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ public class GetHtml {
     public GetHtml() {
     }
 
-    public UrlDataEntity getHtmlByUrl(String url) {
+    public UrlData getHtmlByUrl(String url) {
         String htmlContent = "";
         try {
             htmlContent = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
@@ -26,6 +26,6 @@ public class GetHtml {
             throw new RuntimeException(e);
         }
 
-        return new UrlDataEntity(htmlContent);
+        return new UrlData(htmlContent);
     }
 }

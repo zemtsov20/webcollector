@@ -12,14 +12,18 @@ public class ParsedContent {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
+
     @Column
     private Integer productId;
+
     @Column
     private String productName;
+
     @Column
     private Integer productPrice;
+
     @OneToOne(mappedBy = "parsedContent")
-    private UrlDataEntity urlDataEntity;
+    private UrlData urlData;
 
     public ParsedContent() { }
 
