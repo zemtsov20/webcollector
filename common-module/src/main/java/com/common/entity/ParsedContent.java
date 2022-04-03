@@ -1,35 +1,41 @@
 package com.common.entity;
 
 import lombok.Data;
+import com.common.enums.State;
+import lombok.NoArgsConstructor;
+
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "parsed_content")
 @Data
+@NoArgsConstructor
 public class ParsedContent {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "url")
+    private String url;
 
-    @Column
-    private Integer productId;
+    @Column(name = "product_id")
+    private Long productId;
 
-    @Column
+    @Column(name = "product_name")
     private String productName;
 
-    @Column
-    private Integer productPrice;
+    @Column(name = "date")
+    private Date urlTs;
 
-    @OneToOne(mappedBy = "parsedContent")
-    private UrlData urlData;
+    @Enumerated(EnumType.STRING)
+    private State state;
 
-    public ParsedContent() { }
+    @Lob
+    private String html;
 
-    public ParsedContent(Integer productId, String productName, Integer productPrice) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productPrice = productPrice;
+    public ParsedContent(String url) {
+        this.url = url;
+        this.urlTs = new Date();
+        this.state = State.QUEUED;
     }
 }

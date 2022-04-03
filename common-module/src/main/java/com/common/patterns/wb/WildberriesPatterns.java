@@ -16,8 +16,19 @@ public class WildberriesPatterns {
             = Pattern.compile("class=\"price-block__final-price\">\\D*(\\d{0,3})[^;]*;(\\d{0,3})[^;]*;(\\d{0,3})",
             Pattern.CASE_INSENSITIVE);
 
-    public static final Pattern WB_GOODS_URL
+    public static final Pattern WB_PRODUCT_URL
             = Pattern.compile("((?:http|https)://www\\.wildberries\\.ru/catalog/[\\d]*/detail.aspx)|" +
                                     "(/catalog/[\\d]*/detail.aspx)",
             Pattern.CASE_INSENSITIVE);
+
+    public static final Pattern CATEGORY_BLOCK
+            = Pattern.compile("(<div class=\"menu-catalog\">|hasnochild)([\\s\\S]*?)li([\\s\\S]*?)</div>",
+            //= Pattern.compile("(<div class=\"menu-catalog\">|hasnochild)([\\s\\S]*?)li([\\s\\S]*?)</div>",
+            Pattern.CASE_INSENSITIVE);
+
+    public static final Pattern WB_SUBCATEGORY_URL
+            = Pattern.compile("(/catalog/[/\\w-]*)\"",
+            Pattern.CASE_INSENSITIVE);
+
+    public static final Pattern MAIN_CATEGORY_BLOCK = Pattern.compile("menu-burger__main([\\s\\S]*?)<div", Pattern.CASE_INSENSITIVE);
 }
