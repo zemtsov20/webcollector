@@ -29,8 +29,8 @@ public class ProductDataTs {
     @Column
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id")
     private ProductData productData;
 
     public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale) {

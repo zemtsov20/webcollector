@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -32,8 +33,8 @@ public class ProductData {
     @Enumerated
     private State state;
 
-    @OneToMany(mappedBy = "productData")
-    private Set<ProductDataTs> productDataTs;
+    @OneToMany(mappedBy = "productData", cascade = CascadeType.ALL)
+    private List<ProductDataTs> productDataTs;
 
     @Lob
     private String json;

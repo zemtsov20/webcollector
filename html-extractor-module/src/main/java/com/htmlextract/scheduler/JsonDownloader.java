@@ -9,6 +9,7 @@ import com.common.repository.ProductDataRepository;
 import com.common.repository.SiteDataRepository;
 import com.htmlextract.beans.GetHtml;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.CachedIntrospectionResults;
