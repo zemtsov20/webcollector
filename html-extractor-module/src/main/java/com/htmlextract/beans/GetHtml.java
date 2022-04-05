@@ -1,7 +1,6 @@
 package com.htmlextract.beans;
 
 
-import com.common.entity.ParsedContent;
 import lombok.NoArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
@@ -15,13 +14,18 @@ import java.nio.charset.StandardCharsets;
 @NoArgsConstructor
 public class GetHtml {
     public String getHtmlByUrl(String url) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         String htmlContent = "";
         try {
-            htmlContent = IOUtils.toString(new URL(url), StandardCharsets.ISO_8859_1);
+            htmlContent = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
         } catch (MalformedURLException e) {
             System.out.println("Wrong url! " + e.getMessage() + " for url " + url);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
 
         return htmlContent;

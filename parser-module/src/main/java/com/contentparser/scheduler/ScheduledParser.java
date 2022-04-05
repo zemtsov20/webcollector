@@ -41,7 +41,7 @@ public class ScheduledParser {
     private ParsedContentRepository parsedContentRepository;
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 5)
+    //@Scheduled(fixedDelay = 1000 * 5)
     public void getUrls() {
         logger.info("Scheduling in url parser is working.");
         if (pageUrlRepository.findAll().isEmpty()) {
@@ -82,7 +82,7 @@ public class ScheduledParser {
                     }
                     pageUrlRepository.delete(uncheckedUrl);
                 }
-                logger.info(uncheckedUrl.getUrl() + " checked.");
+                logger.info(uncheckedUrl.getUrl() + " checked, status: " + uncheckedUrl.getState());
             }
         }
         logger.info("Urls category parsing is ended.");

@@ -2,9 +2,11 @@ package com.htmlextract.scheduler;
 
 import com.common.entity.PageUrl;
 import com.common.entity.ParsedContent;
+import com.common.entity.SiteData;
 import com.common.enums.State;
 import com.common.repository.ParsedContentRepository;
 import com.common.repository.PageUrlRepository;
+import com.common.repository.SiteDataRepository;
 import com.htmlextract.beans.GetHtml;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ public class ScheduledTask {
     @Autowired
     private GetHtml getHtml;
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    //@Scheduled(fixedDelay = 1000 * 5)
     public void getCategoriesUrls() {
         logger.info("Scheduling in htmlextract is working.");
         for (PageUrl pageUrl : pageUrlRepository.findByState(State.QUEUED)) {
@@ -66,6 +70,5 @@ public class ScheduledTask {
         }
         pageUrlRepository.save(pageUrl);
     }
-
 
 }

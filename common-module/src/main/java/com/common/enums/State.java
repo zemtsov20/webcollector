@@ -9,6 +9,7 @@ public enum State {
 
         PARSING,
         PARSED,
+        PARSING_ERROR,
 
         CHECKED
 }
