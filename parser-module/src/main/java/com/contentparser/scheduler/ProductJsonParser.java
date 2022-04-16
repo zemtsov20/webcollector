@@ -27,12 +27,13 @@ public class ProductJsonParser {
     private ProductParse productParse;
 
     @Transactional
-    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
     public void getProductInfo() {
-        for (ProductData productData : productDataRepo.findByState(State.DOWNLOADED, PageRequest.of(0, 10))) {
+        for (ProductData productData : productDataRepo.findByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
             productData.setState(State.PARSING);
             productData = productDataRepo.save(productData);
 
+            // if main product info not parsed yet, then parse
             if (productData.getName() == null)
                 productParse.getProductInfo(productData);
 

@@ -34,7 +34,7 @@ public class MainPageJsonParser {
     private CategoryDataRepository categoryDataRepo;
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    //@Scheduled(fixedDelay = 1000 * 60 * 60)
     public void getHierarchy() {
         for (SiteData siteData : siteDataRepo.findByState(State.DOWNLOADED)) {
             siteData.setState(State.PARSING);

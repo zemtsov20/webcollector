@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 @NoArgsConstructor
 public class GetHtml {
-    public String getHtmlByUrl(String url) {
+    public String getResponse(String url) {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {

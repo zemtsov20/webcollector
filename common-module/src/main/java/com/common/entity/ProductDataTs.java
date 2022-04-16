@@ -33,10 +33,10 @@ public class ProductDataTs {
     @JoinColumn(name = "product_id", nullable = false)
     private ProductData productData;
 
-    public ProductDataTs(/*Long productId,*/ Date takenIn, Integer price, Integer priceWithSale) {
-        //this.productId = productId;
+    public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale, Integer quantity) {
         this.takenIn = takenIn;
         this.price = price;
         this.priceWithSale = priceWithSale;
+        this.quantity = quantity;
     }
 }

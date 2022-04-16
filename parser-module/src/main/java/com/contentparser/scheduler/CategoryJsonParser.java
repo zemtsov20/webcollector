@@ -48,9 +48,8 @@ public class CategoryJsonParser {
                 productDataRepo.saveAll(productDataList);
                 // incrementing page to parse new
                 categoryData.incPage();
-                categoryDataRepo.save(categoryData);
             }
-
+            categoryDataRepo.save(categoryData);
             logger.info(categoryData.getPageUrl() + " parsed, state: " + categoryData.getState());
         }
 

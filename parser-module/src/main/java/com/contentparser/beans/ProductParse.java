@@ -15,18 +15,28 @@ public class ProductParse {
 
     public ProductDataTs getProductTsInfo(String json) {
         Gson gson = new Gson();
-        JsonElement color = gson.fromJson(json, JsonObject.class)
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
                 .getAsJsonObject("data")
-                .getAsJsonArray("colors")
-                .get(0);
-        JsonElement nomenclature = gson.fromJson(color, JsonObject.class)
-                .getAsJsonArray("nomenclatures")
-                .get(0);
-        Integer price = gson.fromJson(nomenclature, JsonObject.class).get("rawMinPrice").getAsInt(),
-                priceWithSale = gson.fromJson(nomenclature, JsonObject.class).get("rawMinPriceWithSale").getAsInt();
-        Long productId = gson.fromJson(nomenclature, JsonObject.class).get("cod1S").getAsLong();
+                .getAsJsonArray("products")
+                .get(0).getAsJsonObject();
 
-        return new ProductDataTs(new Date(), price, priceWithSale);
+        int price = jsonObject
+                .getAsJsonPrimitive("priceU").getAsInt() / 100;
+        int priceWithSale = jsonObject
+                .getAsJsonPrimitive("salePriceU").getAsInt() / 100;
+
+        int quantity = 0;
+        var stocksArray = gson.fromJson(
+                jsonObject
+                        .getAsJsonArray("sizes").get(0),
+                JsonObject.class).getAsJsonArray("stocks");
+
+        for (JsonElement element : stocksArray) {
+            quantity += element.getAsJsonObject()
+                    .getAsJsonPrimitive("qty").getAsInt();
+        }
+
+        return new ProductDataTs(new Date(), price, priceWithSale, quantity);
     }
 
     public void getProductInfo(ProductData productData) {
@@ -41,9 +51,10 @@ public class ProductParse {
 
     private ProductData getProductInfoFromJson(String json) {
         Gson gson = new Gson();
-        JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
+        JsonElement jsonObject = gson.fromJson(json, JsonObject.class)
                 .getAsJsonObject("data")
-                .getAsJsonObject("productInfo");
+                .getAsJsonArray("products")
+                .get(0);
 
         return gson.fromJson(jsonObject, ProductData.class);
     }

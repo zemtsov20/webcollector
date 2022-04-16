@@ -22,11 +22,14 @@ public class ProductData {
     @Column
     private String name;
 
+    @Column(name = "supplier_id")
+    private Long supplierId;
+
     @Column(name = "brand_id")
     private Long brandId;
 
-    @Column(name = "brand_name")
-    private String brandName;
+    @Column(name = "brand")
+    private String brand;
 
     @Enumerated
     private State state;
@@ -46,10 +49,7 @@ public class ProductData {
     public void addInfo(ProductData productData) {
         this.name = productData.name;
         this.brandId = productData.brandId;
-        this.brandName = productData.brandName;
+        this.brand = productData.brand;
+        this.supplierId = productData.supplierId;
     }
-
-//    public void addProductDataTs(ProductDataTs productDataTs) {
-//        this.productDataTsList.add(productDataTs);
-//    }
 }

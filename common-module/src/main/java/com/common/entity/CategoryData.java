@@ -35,6 +35,6 @@ public class CategoryData {
     private Integer pageToParse;
 
     public void incPage() {
-        this.pageToParse++;
+        pageToParse = pageToParse == null ? 1 : pageToParse + 1;
     }
 }
