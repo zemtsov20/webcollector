@@ -8,8 +8,8 @@ public enum State {
         DOWNLOADED,
 
         PARSING,
-        PARSED,
         PARSING_ERROR,
+        PARSED,
 
         CHECKED
 }

@@ -1,13 +1,11 @@
 package com.common.entity;
 
 import com.common.enums.State;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -34,7 +32,7 @@ public class ProductData {
     private State state;
 
     @OneToMany(mappedBy = "productData", cascade = CascadeType.ALL)
-    private List<ProductDataTs> productDataTs;
+    private List<ProductDataTs> productDataTsList;
 
     @Lob
     private String json;
@@ -50,4 +48,8 @@ public class ProductData {
         this.brandId = productData.brandId;
         this.brandName = productData.brandName;
     }
+
+//    public void addProductDataTs(ProductDataTs productDataTs) {
+//        this.productDataTsList.add(productDataTs);
+//    }
 }

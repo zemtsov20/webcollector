@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
@@ -33,7 +34,7 @@ public class MainPageJsonParser {
     private CategoryDataRepository categoryDataRepo;
 
     @Transactional
-    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
     public void getHierarchy() {
         for (SiteData siteData : siteDataRepo.findByState(State.DOWNLOADED)) {
             siteData.setState(State.PARSING);
@@ -66,6 +67,7 @@ public class MainPageJsonParser {
             if (jsonArray.size() == 0) {
                 CategoryData categoryData = gson.fromJson(jsonObj, CategoryData.class);
                 categoryData.setState(State.QUEUED);
+                categoryData.setPageToParse(1);
                 dataList.add(categoryData);
             }
             else

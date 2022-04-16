@@ -31,4 +31,10 @@ public class CategoryData {
 
     @Lob
     private String json;
+
+    private Integer pageToParse;
+
+    public void incPage() {
+        this.pageToParse++;
+    }
 }

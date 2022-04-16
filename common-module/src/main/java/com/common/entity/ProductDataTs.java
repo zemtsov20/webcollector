@@ -17,7 +17,7 @@ public class ProductDataTs {
 //    private Long productId;
 
     @Id
-    @Column(name = "taken_in")
+    @Column(name = "taken_in", unique=true, nullable=false)
     private Date takenIn;
 
     @Column
@@ -30,10 +30,11 @@ public class ProductDataTs {
     private Integer quantity;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private ProductData productData;
 
-    public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale) {
+    public ProductDataTs(/*Long productId,*/ Date takenIn, Integer price, Integer priceWithSale) {
+        //this.productId = productId;
         this.takenIn = takenIn;
         this.price = price;
         this.priceWithSale = priceWithSale;

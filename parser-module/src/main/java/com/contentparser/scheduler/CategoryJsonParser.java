@@ -38,14 +38,18 @@ public class CategoryJsonParser {
             categoryData.setState(State.PARSING);
             categoryDataRepo.save(categoryData);
             List<ProductData> productDataList = getProductsFromJson(categoryData.getJson(), categoryData.getPageUrl());
-            if (productDataList.isEmpty())
-                categoryData.setState(State.PARSING_ERROR);
-            else {
+            if (productDataList.isEmpty()) {
                 categoryData.setState(State.PARSED);
+                categoryData.setPageToParse(1);
+            }
+            else {
+                categoryData.setState(State.QUEUED);
                 count += productDataList.size();
                 productDataRepo.saveAll(productDataList);
+                // incrementing page to parse new
+                categoryData.incPage();
+                categoryDataRepo.save(categoryData);
             }
-            categoryDataRepo.save(categoryData);
 
             logger.info(categoryData.getPageUrl() + " parsed, state: " + categoryData.getState());
         }

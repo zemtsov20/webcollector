@@ -24,6 +24,7 @@ public class ProductParse {
                 .get(0);
         Integer price = gson.fromJson(nomenclature, JsonObject.class).get("rawMinPrice").getAsInt(),
                 priceWithSale = gson.fromJson(nomenclature, JsonObject.class).get("rawMinPriceWithSale").getAsInt();
+        Long productId = gson.fromJson(nomenclature, JsonObject.class).get("cod1S").getAsLong();
 
         return new ProductDataTs(new Date(), price, priceWithSale);
     }

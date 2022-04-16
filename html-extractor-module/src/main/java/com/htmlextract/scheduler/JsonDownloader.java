@@ -61,7 +61,9 @@ public class JsonDownloader {
         for (CategoryData categoryData : categoryDataRepo.findByState(State.QUEUED)) {
             categoryData.setState(State.DOWNLOADING);
             categoryDataRepo.save(categoryData);
-            String json = getHtml.getHtmlByUrl(wbApiPrefix + categoryData.getPageUrl());
+            String json = getHtml.getHtmlByUrl(wbApiPrefix  + categoryData.getPageUrl()
+                                                            + "?page="
+                                                            + categoryData.getPageToParse());
             if (json.isEmpty()) {
                 categoryData.setState(State.DOWNLOADING_ERROR);
                 categoryDataRepo.save(categoryData);
