@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @NoArgsConstructor
-public class GetHtml {
+public class WebConnector {
     public String getResponse(String url) {
         try {
             Thread.sleep(500);

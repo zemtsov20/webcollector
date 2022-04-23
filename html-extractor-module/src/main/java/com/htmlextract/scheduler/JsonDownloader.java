@@ -7,7 +7,7 @@ import com.common.enums.State;
 import com.common.repository.CategoryDataRepository;
 import com.common.repository.ProductDataRepository;
 import com.common.repository.SiteDataRepository;
-import com.htmlextract.beans.GetHtml;
+import com.htmlextract.beans.WebConnector;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.util.Date;
 
@@ -26,7 +27,7 @@ public class JsonDownloader {
     private static final String wbApiPrefix = "https://napi.wildberries.ru";
 
     @Autowired
-    private GetHtml getHtml;
+    private WebConnector webConnector;
 
     @Autowired
     private SiteDataRepository siteDataRepo;
@@ -39,7 +40,7 @@ public class JsonDownloader {
 
     //@Scheduled(fixedDelay = 1000 * 60 * 60 * 24 * 7)
     public void getHierarchyJson() {
-        String json = getHtml.getResponse( wbApiPrefix + "/api/menu/getburger?includeBrands=False");
+        String json = webConnector.getResponse( wbApiPrefix + "/api/menu/getburger?includeBrands=False");
         if (json.isEmpty()) {
             siteDataRepo.save(new SiteData(new Date(), State.DOWNLOADING_ERROR, null));
             logger.error("Hierarchy JSON downloading error.");
@@ -50,59 +51,60 @@ public class JsonDownloader {
         }
     }
 
+    @PostConstruct
+    public void testCategoryDownload() {
+        categoryDataRepo.save(new CategoryData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie?page=1", State.QUEUED));
+    }
+
     @Transactional
-    //@Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
+    @Scheduled(fixedDelay = 1000 * 5)
     public void getCategoryJson() {
         int count = 0;
         logger.info("Category JSONs downloading.");
-        for (CategoryData categoryData : categoryDataRepo.findByState(State.QUEUED)) {
+        for (CategoryData categoryData : categoryDataRepo.findByState(State.QUEUED, PageRequest.of(0, 5))) {
             categoryData.setState(State.DOWNLOADING);
             categoryDataRepo.save(categoryData);
-            String json = getHtml.getResponse(wbApiPrefix  + categoryData.getPageUrl()
-                                                            + "?page="
-                                                            + categoryData.getPageToParse());
+            String json = webConnector.getResponse(wbApiPrefix  + categoryData.getPageUrl());
             if (json.isEmpty()) {
                 categoryData.setState(State.DOWNLOADING_ERROR);
-                categoryDataRepo.save(categoryData);
             }
             else {
                 categoryData.setJson(json);
                 categoryData.setState(State.DOWNLOADED);
-                categoryDataRepo.save(categoryData);
                 count++;
             }
+            categoryDataRepo.save(categoryData);
             logger.info(categoryData.getPageUrl() + " prepared, state: " + categoryData.getState());
         }
-        logger.info(count + " category JSONs downloaded successfully.");
+        if (count > 0)
+            logger.info(count + " category JSONs downloaded successfully.");
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000)
     public void getProductJson() {
         int count = 0;
         logger.info("Product JSONs downloading.");
-        for (ProductData productData : productDataRepository.findByState(State.QUEUED, PageRequest.of(0, 20))) {
+        for (ProductData productData : productDataRepository.findByState(State.QUEUED, PageRequest.of(0, 10))) {
             productData.setState(State.DOWNLOADING);
             productDataRepository.save(productData);
-            String json = getHtml.getResponse("https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog" +
+            String json = webConnector.getResponse("https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog" +
                     "?spp=0&regions=64,83,4,38,33,70,82,69,86,75,30,1,40,22,31,66,48,80,71,68" +
                     "&stores=117673,122258,122259,125238,125239,125240,6159,507,3158,117501,120602,120762,6158,121709,124731,159402,2737,130744,117986,1733,686,132043" +
                     "&pricemarginCoeff=1.0&reg=0&appType=1&offlineBonus=0&onlineBonus=0&emp=0&locale=ru&lang=ru&curr=rub" +
                     "&couponsGeo=12,3,18,15,21&dest=-1029256,-102269,-1278703,-1255563&nm=" + productData.getProductId());
             if (json.isEmpty()) {
                 productData.setState(State.DOWNLOADING_ERROR);
-                productDataRepository.save(productData);
             }
             else {
                 productData.setJson(json);
                 productData.setState(State.DOWNLOADED);
-                productDataRepository.save(productData);
                 count++;
             }
+            productDataRepository.save(productData);
         }
-
-        logger.info(count + " product JSONs downloaded successfully.");
+        if (count > 0)
+            logger.info(count + " product JSONs downloaded successfully.");
     }
-
 
 }

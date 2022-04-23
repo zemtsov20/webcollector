@@ -34,8 +34,8 @@ public class ProductData {
     @Enumerated
     private State state;
 
-    @OneToMany(mappedBy = "productData", cascade = CascadeType.ALL)
-    private List<ProductDataTs> productDataTsList;
+//    @OneToMany(mappedBy = "productData", cascade = CascadeType.ALL)
+//    private List<ProductDataTs> productDataTsList;
 
     @Lob
     private String json;

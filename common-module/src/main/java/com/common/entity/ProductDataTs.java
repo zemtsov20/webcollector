@@ -10,11 +10,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Entity
-//@IdClass(ProductDataTsId.class)
+@IdClass(ProductDataTsId.class)
 @Table(name = "product_data_ts")
 public class ProductDataTs {
-//    @Id
-//    private Long productId;
+    @Id
+    private Long productId;
 
     @Id
     @Column(name = "taken_in", unique=true, nullable=false)
@@ -29,9 +29,9 @@ public class ProductDataTs {
     @Column
     private Integer quantity;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", nullable = false)
-    private ProductData productData;
+//    @ManyToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "product_id", nullable = false)
+//    private ProductData productData;
 
     public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale, Integer quantity) {
         this.takenIn = takenIn;

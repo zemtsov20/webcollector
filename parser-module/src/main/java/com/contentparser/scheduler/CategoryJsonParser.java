@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -31,29 +32,31 @@ public class CategoryJsonParser {
     private ProductDataRepository productDataRepo;
 
     @Transactional
-    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 5)
     public void getGoodsList() {
         int count = 0;
-        for (CategoryData categoryData : categoryDataRepo.findByState(State.DOWNLOADED)) {
-            categoryData.setState(State.PARSING);
-            categoryDataRepo.save(categoryData);
+        for (CategoryData categoryData : categoryDataRepo.findByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
             List<ProductData> productDataList = getProductsFromJson(categoryData.getJson(), categoryData.getPageUrl());
+            int replaceTo;
             if (productDataList.isEmpty()) {
                 categoryData.setState(State.PARSED);
-                categoryData.setPageToParse(1);
+                replaceTo = 1;
             }
             else {
                 categoryData.setState(State.QUEUED);
                 count += productDataList.size();
                 productDataRepo.saveAll(productDataList);
                 // incrementing page to parse new
-                categoryData.incPage();
+                int page = categoryData.getPageUrl().lastIndexOf("page=") + 5;
+                replaceTo = Integer.parseInt(categoryData.getPageUrl().substring(page)) + 1;
             }
+            String pageUrl = categoryData.getPageUrl().replaceFirst("page=\\d+", "page=" + replaceTo);
+            categoryData.setPageUrl(pageUrl);
             categoryDataRepo.save(categoryData);
             logger.info(categoryData.getPageUrl() + " parsed, state: " + categoryData.getState());
         }
-
-        logger.info(count + " products parsed successfully.");
+        if (count > 0)
+            logger.info(count + " products parsed successfully.");
     }
 
     private List<ProductData> getProductsFromJson(String json, String categoryUrl) {

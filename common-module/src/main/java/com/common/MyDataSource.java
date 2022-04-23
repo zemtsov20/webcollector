@@ -1,4 +1,4 @@
-//package common;
+//package com.common;
 //
 //import lombok.extern.slf4j.Slf4j;
 //import org.apache.commons.dbcp2.BasicDataSource;
@@ -19,12 +19,12 @@
 //        return instance;
 //    }
 //
-//    private static final String USER = "admin";
-//    private static final String PASS = "mD8qH";
+//    private static final String USER = "renat";
+//    private static final String PASS = "renat";
 //    private static final String VALIDATION_QUERY = "select 1";
 //    private static final String DRIVER_NAME = org.postgresql.Driver.class.getName();
 //    private static final String DB_URL = "jdbc:postgresql://127.0.0.1:5431";
-//    private static final String DB_NAME = "maildb";
+//    private static final String DB_NAME = "wbdata";
 //
 //    public MyDataSource() {
 //        setDriverClassName(DRIVER_NAME);

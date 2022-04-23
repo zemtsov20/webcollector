@@ -67,7 +67,7 @@ public class MainPageJsonParser {
             if (jsonArray.size() == 0) {
                 CategoryData categoryData = gson.fromJson(jsonObj, CategoryData.class);
                 categoryData.setState(State.QUEUED);
-                categoryData.setPageToParse(1);
+                categoryData.setPageUrl(categoryData.getPageUrl().concat("?page=1"));
                 dataList.add(categoryData);
             }
             else

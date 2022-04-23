@@ -14,7 +14,15 @@ JAR=parser-module-0.0.1-SNAPSHOT.jar
 #$ ./run-parser.sh
 #cat: proxies.txt: No such file or directory
 
-java -jar $JAR
+nohup java -jar $JAR >> bot-1.log 2>&1 &
+echo $! > save_pid.txt
+nohup java -jar $JAR >> bot-2.log 2>&1 &
+echo $! > save_pid.txt
+
+sleep 10
+
+kill $(cat save_pid.txt)
+rm save_pid.txt
 
 #PROXY_PORT=34512
 #

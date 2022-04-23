@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -32,9 +33,16 @@ public class CategoryData {
     @Lob
     private String json;
 
-    private Integer pageToParse;
+    //private Integer pageToParse;
 
-    public void incPage() {
-        pageToParse = pageToParse == null ? 1 : pageToParse + 1;
+//    public void incPage() {
+//        pageToParse = pageToParse == null ? 1 : pageToParse + 1;
+//    }
+
+    // constructor for tests
+    public CategoryData(String pageUrl, State state) {
+        this.id = System.currentTimeMillis();
+        this.pageUrl = pageUrl;
+        this.state = state;
     }
 }
