@@ -9,11 +9,12 @@ import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Random;
 
 @Component
 public class ProductParse {
 
-    public ProductDataTs getProductTsInfo(String json) {
+    public ProductDataTs getProductTsInfo(String json) throws InterruptedException {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
                 .getAsJsonObject("data")
@@ -35,7 +36,8 @@ public class ProductParse {
             quantity += element.getAsJsonObject()
                     .getAsJsonPrimitive("qty").getAsInt();
         }
-
+        // temporary, need to fix
+        // Thread.sleep(new Random().nextInt(50));
         return new ProductDataTs(new Date(), price, priceWithSale, quantity);
     }
 

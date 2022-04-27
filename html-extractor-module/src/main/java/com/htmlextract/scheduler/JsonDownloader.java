@@ -53,15 +53,19 @@ public class JsonDownloader {
 
     @PostConstruct
     public void testCategoryDownload() {
+        //categoryDataRepo.save(new CategoryData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie?page=1", State.QUEUED));
         categoryDataRepo.save(new CategoryData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie?page=1", State.QUEUED));
     }
 
     @Transactional
     @Scheduled(fixedDelay = 1000 * 5)
     public void getCategoryJson() {
+        var categories =  categoryDataRepo.findByState(State.QUEUED, PageRequest.of(0, 5));
+        if (categories.isEmpty())
+            return;
         int count = 0;
         logger.info("Category JSONs downloading.");
-        for (CategoryData categoryData : categoryDataRepo.findByState(State.QUEUED, PageRequest.of(0, 5))) {
+        for (CategoryData categoryData : categories) {
             categoryData.setState(State.DOWNLOADING);
             categoryDataRepo.save(categoryData);
             String json = webConnector.getResponse(wbApiPrefix  + categoryData.getPageUrl());
@@ -76,16 +80,18 @@ public class JsonDownloader {
             categoryDataRepo.save(categoryData);
             logger.info(categoryData.getPageUrl() + " prepared, state: " + categoryData.getState());
         }
-        if (count > 0)
-            logger.info(count + " category JSONs downloaded successfully.");
+        logger.info(count + " category JSONs downloaded successfully.");
     }
 
     @Transactional
     @Scheduled(fixedDelay = 1000)
     public void getProductJson() {
+        var products = productDataRepository.findByState(State.QUEUED, PageRequest.of(0, 10));
+        if (products.isEmpty())
+            return;
         int count = 0;
         logger.info("Product JSONs downloading.");
-        for (ProductData productData : productDataRepository.findByState(State.QUEUED, PageRequest.of(0, 10))) {
+        for (ProductData productData : products) {
             productData.setState(State.DOWNLOADING);
             productDataRepository.save(productData);
             String json = webConnector.getResponse("https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog" +
@@ -103,8 +109,19 @@ public class JsonDownloader {
             }
             productDataRepository.save(productData);
         }
-        if (count > 0)
-            logger.info(count + " product JSONs downloaded successfully.");
+        logger.info(count + " product JSONs downloaded successfully.");
     }
 
+    @Transactional
+    @Scheduled(fixedDelay = 1000 * 100)
+    public void setProductsToUpdate() {
+        var products = productDataRepository.findByState(State.PARSED, PageRequest.of(0, 100));
+        if (products.isEmpty())
+            return;
+        for (ProductData productData : products) {
+            productData.setState(State.QUEUED);
+            productDataRepository.save(productData);
+        }
+        logger.info("New products queued for TS");
+    }
 }

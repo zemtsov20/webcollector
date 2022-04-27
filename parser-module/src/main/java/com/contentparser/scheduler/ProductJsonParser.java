@@ -34,7 +34,7 @@ public class ProductJsonParser {
     @Transactional
     @Scheduled(fixedDelay = 500)
     public void getProductInfo() throws InterruptedException {
-        Thread.sleep(new Random().nextInt(100));
+        //Thread.sleep(new Random().nextInt(100));
         int counter = 0;
         for (ProductData productData : productDataRepo.findByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
             // if main product info not parsed yet, then parse

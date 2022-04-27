@@ -1,6 +1,5 @@
 package com.common.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,10 +27,6 @@ public class ProductDataTs {
 
     @Column
     private Integer quantity;
-
-//    @ManyToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "product_id", nullable = false)
-//    private ProductData productData;
 
     public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale, Integer quantity) {
         this.takenIn = takenIn;
