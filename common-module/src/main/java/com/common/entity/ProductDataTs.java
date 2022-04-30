@@ -16,7 +16,7 @@ public class ProductDataTs {
     private Long productId;
 
     @Id
-    @Column(name = "taken_in", unique=true, nullable=false)
+    @Column(name = "taken_in", nullable=false)
     private Date takenIn;
 
     @Column

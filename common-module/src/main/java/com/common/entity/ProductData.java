@@ -1,11 +1,12 @@
 package com.common.entity;
 
-import com.common.enums.State;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Data
 @NoArgsConstructor
@@ -31,19 +32,9 @@ public class ProductData {
     @Column(name = "brand")
     private String brand;
 
-    @Enumerated
-    private State state;
-
-//    @OneToMany(mappedBy = "productData", cascade = CascadeType.ALL)
-//    private List<ProductDataTs> productDataTsList;
-
-    @Lob
-    private String json;
-
     public ProductData(Long productId, String categoryUrl) {
         this.productId = productId;
         this.categoryUrl = categoryUrl;
-        this.state = State.QUEUED;
     }
 
     public void addInfo(ProductData productData) {

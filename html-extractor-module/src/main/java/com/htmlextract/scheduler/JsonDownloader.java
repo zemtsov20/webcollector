@@ -1,10 +1,10 @@
 package com.htmlextract.scheduler;
 
-import com.common.entity.CategoryData;
 import com.common.entity.ProductData;
+import com.common.entity.RawData;
 import com.common.entity.SiteData;
 import com.common.enums.State;
-import com.common.repository.CategoryDataRepository;
+import com.common.repository.RawDataRepository;
 import com.common.repository.ProductDataRepository;
 import com.common.repository.SiteDataRepository;
 import com.htmlextract.beans.WebConnector;
@@ -33,7 +33,7 @@ public class JsonDownloader {
     private SiteDataRepository siteDataRepo;
 
     @Autowired
-    private CategoryDataRepository categoryDataRepo;
+    private RawDataRepository rawDataRepo;
 
     @Autowired
     private ProductDataRepository productDataRepository;
@@ -51,77 +51,53 @@ public class JsonDownloader {
         }
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void testCategoryDownload() {
-        //categoryDataRepo.save(new CategoryData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie?page=1", State.QUEUED));
-        categoryDataRepo.save(new CategoryData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie?page=1", State.QUEUED));
+        rawDataRepo.save(new RawData("/api/catalog/muzhchinam/religioznaya", State.QUEUED));
+        //rawDataRepo.save(new RawData("/api/catalog/detyam/tovary-dlya-malysha/podguzniki/podguzniki-detskie", State.QUEUED));
     }
 
     @Transactional
     @Scheduled(fixedDelay = 1000 * 5)
     public void getCategoryJson() {
-        var categories =  categoryDataRepo.findByState(State.QUEUED, PageRequest.of(0, 5));
-        if (categories.isEmpty())
+        var rawDataList =  rawDataRepo.findByState(State.QUEUED, PageRequest.of(0, 5));
+        if (rawDataList.isEmpty())
             return;
         int count = 0;
-        logger.info("Category JSONs downloading.");
-        for (CategoryData categoryData : categories) {
-            categoryData.setState(State.DOWNLOADING);
-            categoryDataRepo.save(categoryData);
-            String json = webConnector.getResponse(wbApiPrefix  + categoryData.getPageUrl());
+        logger.info("JSONs downloading...");
+        for (RawData rawData : rawDataList) {
+            String request;
+            if (rawData.getDataRef().contains("api"))
+                request = wbApiPrefix + rawData.getDataRef();
+            else
+                request = "https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog" +
+                        "?spp=0&regions=64,83,4,38,33,70,82,69,86,75,30,1,40,22,31,66,48,80,71,68" +
+                        "&stores=117673,122258,122259,125238,125239,125240,6159,507,3158,117501,120602,120762,6158,121709,124731,159402,2737,130744,117986,1733,686,132043" +
+                        "&pricemarginCoeff=1.0&reg=0&appType=1&offlineBonus=0&onlineBonus=0&emp=0&locale=ru&lang=ru&curr=rub" +
+                        "&couponsGeo=12,3,18,15,21&dest=-1029256,-102269,-1278703,-1255563&nm=" + rawData.getDataRef();
+            String json = webConnector.getResponse(request);
             if (json.isEmpty()) {
-                categoryData.setState(State.DOWNLOADING_ERROR);
+                rawData.setState(State.DOWNLOADING_ERROR);
             }
             else {
-                categoryData.setJson(json);
-                categoryData.setState(State.DOWNLOADED);
+                rawData.setJson(json);
+                rawData.setState(State.DOWNLOADED);
                 count++;
             }
-            categoryDataRepo.save(categoryData);
-            logger.info(categoryData.getPageUrl() + " prepared, state: " + categoryData.getState());
+            rawDataRepo.save(rawData);
+            logger.info(rawData.getDataRef() + " prepared, state: " + rawData.getState());
         }
-        logger.info(count + " category JSONs downloaded successfully.");
+        logger.info(count + " JSONs downloaded successfully.");
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 1000)
-    public void getProductJson() {
-        var products = productDataRepository.findByState(State.QUEUED, PageRequest.of(0, 10));
-        if (products.isEmpty())
-            return;
-        int count = 0;
-        logger.info("Product JSONs downloading.");
-        for (ProductData productData : products) {
-            productData.setState(State.DOWNLOADING);
-            productDataRepository.save(productData);
-            String json = webConnector.getResponse("https://wbxcatalog-ru.wildberries.ru/nm-2-card/catalog" +
-                    "?spp=0&regions=64,83,4,38,33,70,82,69,86,75,30,1,40,22,31,66,48,80,71,68" +
-                    "&stores=117673,122258,122259,125238,125239,125240,6159,507,3158,117501,120602,120762,6158,121709,124731,159402,2737,130744,117986,1733,686,132043" +
-                    "&pricemarginCoeff=1.0&reg=0&appType=1&offlineBonus=0&onlineBonus=0&emp=0&locale=ru&lang=ru&curr=rub" +
-                    "&couponsGeo=12,3,18,15,21&dest=-1029256,-102269,-1278703,-1255563&nm=" + productData.getProductId());
-            if (json.isEmpty()) {
-                productData.setState(State.DOWNLOADING_ERROR);
-            }
-            else {
-                productData.setJson(json);
-                productData.setState(State.DOWNLOADED);
-                count++;
-            }
-            productDataRepository.save(productData);
-        }
-        logger.info(count + " product JSONs downloaded successfully.");
-    }
-
-    @Transactional
-    @Scheduled(fixedDelay = 1000 * 100)
-    public void setProductsToUpdate() {
+    @Scheduled(fixedDelay = 1000 * 10)
+    public void setProductsForTS() {
         var products = productDataRepository.findByState(State.PARSED, PageRequest.of(0, 100));
         if (products.isEmpty())
             return;
-        for (ProductData productData : products) {
-            productData.setState(State.QUEUED);
-            productDataRepository.save(productData);
-        }
-        logger.info("New products queued for TS");
+        products.forEach(product -> rawDataRepo.save(new RawData(product.getProductId().toString(), State.QUEUED)));
+
+        logger.info(products.size() + " products queued for TS");
     }
 }

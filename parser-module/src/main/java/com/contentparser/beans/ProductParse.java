@@ -2,6 +2,7 @@ package com.contentparser.beans;
 
 import com.common.entity.ProductData;
 import com.common.entity.ProductDataTs;
+import com.common.entity.RawData;
 import com.common.enums.State;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -9,12 +10,10 @@ import com.google.gson.JsonObject;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Random;
 
 @Component
 public class ProductParse {
-
-    public ProductDataTs getProductTsInfo(String json) throws InterruptedException {
+    public ProductDataTs getProductTsInfo(String json) {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
                 .getAsJsonObject("data")
@@ -36,28 +35,29 @@ public class ProductParse {
             quantity += element.getAsJsonObject()
                     .getAsJsonPrimitive("qty").getAsInt();
         }
-        // temporary, need to fix
-        // Thread.sleep(new Random().nextInt(50));
         return new ProductDataTs(new Date(), price, priceWithSale, quantity);
     }
 
-    public void getProductInfo(ProductData productData) {
-        var temp = getProductInfoFromJson(productData.getJson());
+    public ProductData getProductInfo(RawData rawData) {
+        var productData = getProductInfoFromJson(rawData.getJson());
 
-        if (temp.getName() != null) {
-            productData.addInfo(temp);
+        if (productData.getName() != null) {
+            productData.addInfo(productData);
         }
         else
-            productData.setState(State.PARSING_ERROR);
+            rawData.setState(State.PARSING_ERROR);
+
+        return productData;
     }
 
     private ProductData getProductInfoFromJson(String json) {
         Gson gson = new Gson();
-        JsonElement jsonObject = gson.fromJson(json, JsonObject.class)
-                .getAsJsonObject("data")
-                .getAsJsonArray("products")
-                .get(0);
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
+                .getAsJsonObject("data");
+        ProductData productData = gson.fromJson(jsonObject.getAsJsonObject("productInfo"), ProductData.class);
+        jsonObject = jsonObject.getAsJsonArray("colors").get(0).getAsJsonObject();
+        productData.setProductId(jsonObject.get("cod1S").getAsLong());
 
-        return gson.fromJson(jsonObject, ProductData.class);
+        return productData;
     }
 }

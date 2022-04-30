@@ -12,13 +12,14 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
 import javax.persistence.QueryHint;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
 public interface ProductDataRepository extends JpaRepository<ProductData, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(value = "SELECT s FROM ProductData s WHERE s.state = ?1")
+    @Query(value = "SELECT s FROM ProductData s")
     @QueryHints(@QueryHint(name = AvailableSettings.JPA_LOCK_TIMEOUT, value = "-2"/*SKIP_LOCKED constant*/))
     List<ProductData> findByState(State state, Pageable pageable);
 }

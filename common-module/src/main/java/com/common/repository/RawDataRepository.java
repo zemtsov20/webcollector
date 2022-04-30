@@ -1,6 +1,6 @@
 package com.common.repository;
 
-import com.common.entity.CategoryData;
+import com.common.entity.RawData;
 import com.common.enums.State;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ import javax.persistence.QueryHint;
 import java.util.List;
 
 @Repository
-public interface CategoryDataRepository extends JpaRepository<CategoryData, Long> {
+public interface RawDataRepository extends JpaRepository<RawData, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(value = "SELECT s FROM CategoryData s WHERE s.state = ?1")
+    @Query(value = "SELECT s FROM RawData s WHERE s.state = ?1")
     @QueryHints(@QueryHint(name = AvailableSettings.JPA_LOCK_TIMEOUT, value = "-2"/*SKIP_LOCKED constant*/))
-    List<CategoryData> findByState(State state, Pageable pageable);
+    List<RawData> findByState(State state, Pageable pageable);
 }
