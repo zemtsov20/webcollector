@@ -1,9 +1,10 @@
 package com.web.controllers;
 
-import com.common.entity.ProductData;
 import com.common.enums.State;
-import com.common.repository.ProductDataRepository;
-import com.common.repository.ProductDataTsRepository;
+import com.web.models.BasicStatistic;
+import com.web.models.DonutStatistic;
+import com.web.models.SubcategoryStatistic;
+import com.web.services.StatisticService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,29 +27,22 @@ import java.util.stream.Collectors;
 public class BasicController {
 
     @Autowired
-    private ProductDataRepository productDataRepo;
+    StatisticService statisticService;
 
-    @Autowired
-    private ProductDataTsRepository productDataTsRepo;
-
-    @Transactional
-    @GetMapping("/basic")
-    public List<BasicStatistic> getBasicStatistic(@RequestParam(name="period") String period, @RequestParam(name="name") String name) {
-
-        return productDataRepo.findByState(State.PARSED, PageRequest.of(0, 5))
-                .stream()
-                .map(productData ->
-                        new BasicStatistic(productData.getProductId().toString(), period ,productData.getName()))
-                .collect(Collectors.toList());
+    @GetMapping("/basic-statistics")
+    public List<BasicStatistic> getBasicStatistics(@RequestParam(name="start") String start,
+                                                   @RequestParam(name="end") String end,
+                                                   @RequestParam(name="ref") String ref) throws ParseException {
+        return statisticService.getBasicStatistic(start, end, ref);
     }
-
-    @Data
-    @AllArgsConstructor
-    private static class BasicStatistic {
-        private String averagePrice;
-
-        private String period;
-
-        private String goods;
+    @GetMapping("/subcategory-statistics")
+    public List<SubcategoryStatistic> getFullStatistics(@RequestParam(name="start") String start,
+                                                        @RequestParam(name="end") String end,
+                                                        @RequestParam(name="ref") String ref) throws ParseException {
+        return statisticService.getSubcategoryStatistic(start, end, ref);
+    }
+    @GetMapping("/donut-statistics")
+    public List<DonutStatistic> getDonutStatistics(@RequestParam(name="ref") String ref) {
+        return statisticService.getDonutStatistic(ref);
     }
 }

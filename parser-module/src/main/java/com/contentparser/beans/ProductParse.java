@@ -2,8 +2,6 @@ package com.contentparser.beans;
 
 import com.common.entity.ProductData;
 import com.common.entity.ProductDataTs;
-import com.common.entity.RawData;
-import com.common.enums.State;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,6 +18,7 @@ public class ProductParse {
                 .getAsJsonArray("products")
                 .get(0).getAsJsonObject();
 
+        long productId = jsonObject.getAsJsonPrimitive("id").getAsLong();
         int price = jsonObject
                 .getAsJsonPrimitive("priceU").getAsInt() / 100;
         int priceWithSale = jsonObject
@@ -35,22 +34,10 @@ public class ProductParse {
             quantity += element.getAsJsonObject()
                     .getAsJsonPrimitive("qty").getAsInt();
         }
-        return new ProductDataTs(new Date(), price, priceWithSale, quantity);
+        return new ProductDataTs(productId, new Date(), price, priceWithSale, quantity);
     }
 
-    public ProductData getProductInfo(RawData rawData) {
-        var productData = getProductInfoFromJson(rawData.getJson());
-
-        if (productData.getName() != null) {
-            productData.addInfo(productData);
-        }
-        else
-            rawData.setState(State.PARSING_ERROR);
-
-        return productData;
-    }
-
-    private ProductData getProductInfoFromJson(String json) {
+    public ProductData getProductInfo(String json) {
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class)
                 .getAsJsonObject("data");

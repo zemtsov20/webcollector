@@ -24,6 +24,8 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.common.utils.Constants.wbApiPrefix;
+
 @Component
 @RequiredArgsConstructor
 public class JsonParser {
@@ -42,10 +44,10 @@ public class JsonParser {
     private ProductDataTsRepository productDataTsRepo;
 
     @Transactional
-    @Scheduled(fixedDelay = 1000 * 5)
+    @Scheduled(fixedDelay = 100)
     public void getInfoFromRawData() {
         int count = 0;
-        for (RawData rawData : rawDataRepo.findByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
+        for (RawData rawData : rawDataRepo.findAndLockByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
             String currentJson = rawData.getJson();
             String dataRef = rawData.getDataRef();
             if (currentJson.isEmpty()) {
@@ -53,26 +55,31 @@ public class JsonParser {
             }
             else {
                 if (dataRef.contains("detail.aspx")) {
-                    ProductData productData = productParse.getProductInfo(rawData);
-                    productDataRepo.save(productData);
+                    ProductData productData = productParse.getProductInfo(currentJson);
+                    if (productData.getName() != null) {
+                        productData.setCategoryUrl(rawData.getParentRef());
+                        productDataRepo.save(productData);
+                    }
+                    else {
+                        rawData.setState(State.PARSING_ERROR);
+                        continue;
+                    }
                 }
                 else if (dataRef.contains("api")) {
                     List<RawData> rawDataList;
                     if (currentJson.contains("currentMenu")
                             && !(rawDataList = getCategoriesList(currentJson, dataRef)).isEmpty()) {
                         logger.info("Added " + rawDataList.size() + " subcategories from " + rawData.getDataRef());
+                        count += rawDataList.size();
                     }
                     else {
-                        rawDataList = getProductsFromJson(currentJson);
-                        rawDataList.forEach(rawData1 -> rawData1.setParentRef(dataRef));
-                        if (!dataRef.contains("page"))
-                            rawDataRepo.saveAll(getCategoryPagesList(currentJson, dataRef));
+                        rawDataList = getProductsFromJson(currentJson, dataRef);
+//                        if (!dataRef.contains("page"))
+//                            rawDataRepo.saveAll(getCategoryPagesList(currentJson, dataRef));
                     }
-                    count += rawDataList.size();
                     rawDataRepo.saveAll(rawDataList);
                 } else {
                     ProductDataTs productDataTs = productParse.getProductTsInfo(currentJson);
-                    productDataTs.setProductId(Long.parseLong(dataRef));
                     productDataTsRepo.save(productDataTs);
                 }
                 rawData.setState(State.PARSED);
@@ -81,7 +88,7 @@ public class JsonParser {
             logger.info(rawData.getDataRef() + " parsed, state: " + rawData.getState());
         }
         if (count > 0)
-            logger.info(count + " products parsed successfully.");
+            logger.info(count + " JSONs parsed successfully.");
     }
 
     private List<RawData> getCategoryPagesList(String json, String pageUrl) {
@@ -94,7 +101,7 @@ public class JsonParser {
                 .getAsInt();
 
         for (int i = 2; i <= 100 && i <= totalPages; i++) {
-            rawDataList.add(new RawData(pageUrl + "?page=" + i, State.QUEUED));
+            rawDataList.add(new RawData(pageUrl + "?page=" + i, pageUrl, State.QUEUED));
         }
 
         return rawDataList;
@@ -111,18 +118,19 @@ public class JsonParser {
 
         if (jsonArray != null && jsonArray.size() != 0) {
             for (JsonElement jsonElement : jsonArray) {
-                String newUrl = gson.fromJson(jsonElement, JsonObject.class)
+                String newUrl = wbApiPrefix + gson.fromJson(jsonElement, JsonObject.class)
                         .get("url")
                         .getAsString();
+                // TODO make check better
                 if (newUrl.contains(url) && !newUrl.equals(url))
-                    rawDataList.add(new RawData(newUrl, State.QUEUED));
+                    rawDataList.add(new RawData(newUrl, url, State.QUEUED));
             }
         }
 
         return rawDataList;
     }
 
-    private List<RawData> getProductsFromJson(String json) {
+    private List<RawData> getProductsFromJson(String json, String parentRef) {
         List<RawData> rawDataList = new ArrayList<>();
 
         JsonArray jsonArray = new Gson().fromJson(json, JsonObject.class)
@@ -130,7 +138,8 @@ public class JsonParser {
                 .getAsJsonArray("products");
         if (jsonArray != null && jsonArray.size() != 0)
             jsonArray.forEach(productId -> rawDataList
-                    .add(new RawData("/api/catalog/" + productId.getAsString() + "/detail.aspx", State.QUEUED)));
+                    .add(new RawData(wbApiPrefix + "/api/catalog/"
+                            + productId.getAsString() + "/detail.aspx", parentRef, State.QUEUED)));
 
         return rawDataList;
     }

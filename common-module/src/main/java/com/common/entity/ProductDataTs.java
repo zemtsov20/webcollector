@@ -1,5 +1,6 @@
 package com.common.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @IdClass(ProductDataTsId.class)
@@ -27,11 +29,4 @@ public class ProductDataTs {
 
     @Column
     private Integer quantity;
-
-    public ProductDataTs(Date takenIn, Integer price, Integer priceWithSale, Integer quantity) {
-        this.takenIn = takenIn;
-        this.price = price;
-        this.priceWithSale = priceWithSale;
-        this.quantity = quantity;
-    }
 }

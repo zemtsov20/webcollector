@@ -20,5 +20,5 @@ public interface RawDataRepository extends JpaRepository<RawData, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(value = "SELECT s FROM RawData s WHERE s.state = ?1")
     @QueryHints(@QueryHint(name = AvailableSettings.JPA_LOCK_TIMEOUT, value = "-2"/*SKIP_LOCKED constant*/))
-    List<RawData> findByState(State state, Pageable pageable);
+    List<RawData> findAndLockByState(State state, Pageable pageable);
 }

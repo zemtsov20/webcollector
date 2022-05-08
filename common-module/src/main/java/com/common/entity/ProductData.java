@@ -23,24 +23,16 @@ public class ProductData {
     @Column
     private String name;
 
-    @Column(name = "supplier_id")
-    private Long supplierId;
-
     @Column(name = "brand_id")
     private Long brandId;
 
-    @Column(name = "brand")
-    private String brand;
+    @Column(name = "brand_name")
+    private String brandName;
 
-    public ProductData(Long productId, String categoryUrl) {
-        this.productId = productId;
-        this.categoryUrl = categoryUrl;
-    }
+    @Column(name = "feedback_count")
+    private Integer feedbackCount;
 
-    public void addInfo(ProductData productData) {
-        this.name = productData.name;
-        this.brandId = productData.brandId;
-        this.brand = productData.brand;
-        this.supplierId = productData.supplierId;
-    }
+    @Column
+    private Integer rating;
+
 }

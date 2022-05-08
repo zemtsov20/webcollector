@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name = "raw_data")
 public class RawData {
     @Id
-    @Column(name = "data_ref")
+    @Column(name = "data_ref", columnDefinition="TEXT")
     private String dataRef;
 
     @Column(name = "parent_ref")
@@ -27,8 +27,9 @@ public class RawData {
     private String json;
 
     // constructor for tests
-    public RawData(String dataRef, State state) {
+    public RawData(String dataRef, String parentRef, State state) {
         this.dataRef = dataRef;
+        this.parentRef = parentRef;
         this.state = state;
     }
 }

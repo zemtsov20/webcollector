@@ -14,11 +14,11 @@ import java.nio.charset.StandardCharsets;
 @NoArgsConstructor
 public class WebConnector {
     public String getResponse(String url) {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(250);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         String htmlContent = "";
         try {
             htmlContent = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
