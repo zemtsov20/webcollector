@@ -1,9 +1,10 @@
 package com.web.services;
 
+import com.common.entity.CategoryData;
 import com.common.entity.ProductData;
+import com.common.repository.CategoryDataRepository;
 import com.common.repository.ProductDataRepository;
 import com.common.repository.ProductDataTsRepository;
-import com.common.utils.SqlDonutStatistic;
 import com.web.models.BasicStatistic;
 import com.web.models.DonutStatistic;
 import com.web.models.SubcategoryStatistic;
@@ -22,6 +23,9 @@ import static com.common.utils.Constants.wbApiPrefix;
 
 @Service
 public class StatisticService {
+    @Autowired
+    private CategoryDataRepository categoryDataRepo;
+
     @Autowired
     private ProductDataRepository productDataRepo;
 
@@ -54,14 +58,21 @@ public class StatisticService {
 
     public List<SubcategoryStatistic> getSubcategoryStatistic(String startDateStr, String endDateStr, String categoryUrl) throws ParseException {
         List<SubcategoryStatistic> subcategoryStatistics = new ArrayList<>();
-        for (var subcategoryUrl : productDataRepo.findDistinctByCategoryUrlContaining(categoryUrl)) {
-            subcategoryStatistics.add(new SubcategoryStatistic(getBasicStatistic(startDateStr, endDateStr, subcategoryUrl),
-                    subcategoryUrl.replace(wbApiPrefix + categoryUrl + "/", "")));
+        CategoryData categoryData = categoryDataRepo.findTopByPageUrl(categoryUrl);
+        if (categoryData != null) {
+            for (var subcategoryData : categoryDataRepo.findAllByParentId(categoryData.getId())) {
+                subcategoryStatistics.add(new SubcategoryStatistic(getBasicStatistic(startDateStr, endDateStr, subcategoryData.getPageUrl()),
+                        subcategoryData.getName()));
+            }
         }
+
         return subcategoryStatistics;
     }
 
     public List<DonutStatistic> getDonutStatistic(String categoryUrl) {
-        return productDataRepo.findDistinctCountByBrandNameContaining(categoryUrl).stream().map(DonutStatistic::new).collect(Collectors.toList());
+        return productDataRepo.findDistinctCountByBrandNameContaining(categoryUrl)
+                .stream()
+                .map(DonutStatistic::new)
+                .collect(Collectors.toList());
     }
 }

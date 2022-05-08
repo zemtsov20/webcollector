@@ -1,12 +1,8 @@
 package com.contentparser.scheduler;
 
-import com.common.entity.ProductDataTs;
-import com.common.entity.RawData;
-import com.common.entity.ProductData;
+import com.common.entity.*;
 import com.common.enums.State;
-import com.common.repository.ProductDataTsRepository;
-import com.common.repository.RawDataRepository;
-import com.common.repository.ProductDataRepository;
+import com.common.repository.*;
 import com.contentparser.beans.ProductParse;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -21,8 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.common.utils.Constants.wbApiPrefix;
 
@@ -43,52 +38,75 @@ public class JsonParser {
     @Autowired
     private ProductDataTsRepository productDataTsRepo;
 
+    @Autowired
+    private CategoryDataRepository categoryDataRepo;
+
+    @Autowired
+    private SiteDataRepository siteDataRepo;
+
     @Transactional
     @Scheduled(fixedDelay = 100)
     public void getInfoFromRawData() {
         int count = 0;
-        for (RawData rawData : rawDataRepo.findAndLockByState(State.DOWNLOADED, PageRequest.of(0, 5))) {
+        for (RawData rawData : rawDataRepo.findAndLockByState(State.DOWNLOADED, PageRequest.of(0, 1))) {
             String currentJson = rawData.getJson();
             String dataRef = rawData.getDataRef();
             if (currentJson.isEmpty()) {
                 rawData.setState(State.PARSING_ERROR);
-            }
-            else {
-                if (dataRef.contains("detail.aspx")) {
+            } else {
+                if (dataRef.contains("getburger")) {
+                    if (menuBurgerCheck(currentJson)) {
+                        var siteDataList = siteDataRepo.findAll(PageRequest.of(0, 1)).toList();
+                        SiteData siteData;
+                        if (siteDataList.isEmpty())
+                            siteData = new SiteData(new Date(), currentJson);
+                        else {
+                            siteData = siteDataList.get(0);
+                            siteData.setJson(currentJson);
+                            siteData.setDateTs(new Date());
+                        }
+                        siteDataRepo.save(siteData);
+                        categoryDataRepo.saveAll(getAllCategoriesFromMenu(currentJson));
+                        rawData.setState(State.PARSED);
+                    } else
+                        rawData.setState(State.PARSING_ERROR);
+                } else if (dataRef.contains("detail.aspx")) {
                     ProductData productData = productParse.getProductInfo(currentJson);
                     if (productData.getName() != null) {
                         productData.setCategoryUrl(rawData.getParentRef());
                         productDataRepo.save(productData);
-                    }
-                    else {
+                        rawData.setState(State.PARSED);
+                    } else
                         rawData.setState(State.PARSING_ERROR);
-                        continue;
-                    }
-                }
-                else if (dataRef.contains("api")) {
+                } else if (dataRef.contains("api")) {
                     List<RawData> rawDataList;
-                    if (currentJson.contains("currentMenu")
-                            && !(rawDataList = getCategoriesList(currentJson, dataRef)).isEmpty()) {
+                    // checking is category last node
+                    if ((rawDataList = getCategoriesList(rawData.getDataRef())).isEmpty()) {
+                        rawDataList = getProductsFromJson(currentJson, dataRef);
+                        if (!dataRef.contains("page"))
+                            rawDataRepo.saveAll(getCategoryPagesList(currentJson, dataRef));
+                    } else {
                         logger.info("Added " + rawDataList.size() + " subcategories from " + rawData.getDataRef());
                         count += rawDataList.size();
                     }
-                    else {
-                        rawDataList = getProductsFromJson(currentJson, dataRef);
-//                        if (!dataRef.contains("page"))
-//                            rawDataRepo.saveAll(getCategoryPagesList(currentJson, dataRef));
-                    }
                     rawDataRepo.saveAll(rawDataList);
+                    rawData.setState(State.PARSED);
                 } else {
                     ProductDataTs productDataTs = productParse.getProductTsInfo(currentJson);
                     productDataTsRepo.save(productDataTs);
+                    rawData.setState(State.PARSED);
                 }
-                rawData.setState(State.PARSED);
             }
             rawDataRepo.save(rawData);
             logger.info(rawData.getDataRef() + " parsed, state: " + rawData.getState());
         }
         if (count > 0)
             logger.info(count + " JSONs parsed successfully.");
+    }
+
+    private boolean menuBurgerCheck(String currentJson) {
+        // TODO check JSON
+        return true;
     }
 
     private List<RawData> getCategoryPagesList(String json, String pageUrl) {
@@ -107,24 +125,21 @@ public class JsonParser {
         return rawDataList;
     }
 
-    private List<RawData> getCategoriesList(String json, String url) {
+    private List<RawData> getCategoriesList(String url) {
         List<RawData> rawDataList = new ArrayList<>();
-
-        Gson gson = new Gson();
-        JsonArray jsonArray = gson.fromJson(json, JsonObject.class)
-                .getAsJsonObject("data")
-                .getAsJsonArray("currentMenu");
-
-
-        if (jsonArray != null && jsonArray.size() != 0) {
-            for (JsonElement jsonElement : jsonArray) {
-                String newUrl = wbApiPrefix + gson.fromJson(jsonElement, JsonObject.class)
-                        .get("url")
-                        .getAsString();
-                // TODO make check better
-                if (newUrl.contains(url) && !newUrl.equals(url))
-                    rawDataList.add(new RawData(newUrl, url, State.QUEUED));
-            }
+        CategoryData categoryData = categoryDataRepo
+                .findTopByPageUrl(url.replace(wbApiPrefix, ""));
+        if (categoryData != null && categoryData.hasChildren) {
+            Queue<CategoryData> categoryDataQueue = new LinkedList<>();
+            categoryDataQueue.add(categoryData);
+            do {
+                var temp = categoryDataQueue.remove();
+                if (temp.hasChildren) {
+                    categoryDataQueue.addAll(categoryDataRepo.findAllByParentId(temp.getId()));
+                }
+                else
+                    rawDataList.add(new RawData(wbApiPrefix + temp.getPageUrl(), url, State.QUEUED));
+            } while (!categoryDataQueue.isEmpty());
         }
 
         return rawDataList;
@@ -144,16 +159,28 @@ public class JsonParser {
         return rawDataList;
     }
 
-//    private List<ProductData> getProductsFromJson(String json, String categoryUrl) {
-//        List<ProductData> productDataList = new ArrayList<>();
-//
-//        JsonArray jsonArray = new Gson().fromJson(json, JsonObject.class)
-//                .getAsJsonObject("data")
-//                .getAsJsonArray("products");
-//        if (jsonArray != null && jsonArray.size() != 0)
-//            jsonArray.forEach(product -> productDataList
-//                    .add(new ProductData(product.getAsLong(), categoryUrl)));
-//
-//        return productDataList;
-//    }
+    private List<CategoryData> getAllCategoriesFromMenu(String json) {
+        List<CategoryData> dataList = new ArrayList<>();
+        Gson gson = new Gson();
+        Queue<JsonElement> queue = new LinkedList<>();
+        gson.fromJson(json, JsonObject.class)
+                .getAsJsonObject("data")
+                .getAsJsonArray("catalog")
+                .forEach(queue::add);
+
+        while (!queue.isEmpty()) {
+            JsonObject jsonObj = queue.remove().getAsJsonObject();
+            JsonArray jsonArray = jsonObj.getAsJsonArray("childNodes");
+            CategoryData categoryData = gson.fromJson(jsonObj, CategoryData.class);
+            if (jsonArray.size() != 0) {
+                categoryData.setHasChildren(true);
+                jsonArray.forEach(queue::add);
+            }
+            else
+                categoryData.setHasChildren(false);
+            dataList.add(categoryData);
+        }
+
+        return dataList;
+    }
 }

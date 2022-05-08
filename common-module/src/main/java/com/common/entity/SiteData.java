@@ -18,9 +18,6 @@ public class SiteData {
     @Column(name = "date_ts")
     private Date dateTs;
 
-    @Enumerated
-    private State state;
-
     @Lob
     String json;
 }

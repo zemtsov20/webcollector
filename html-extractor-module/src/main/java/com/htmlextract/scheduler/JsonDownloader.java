@@ -31,36 +31,20 @@ public class JsonDownloader {
     private WebConnector webConnector;
 
     @Autowired
-    private SiteDataRepository siteDataRepo;
-
-    @Autowired
     private RawDataRepository rawDataRepo;
 
     @Autowired
     private ProductDataRepository productDataRepository;
 
-    //@Scheduled(fixedDelay = 1000 * 60 * 60 * 24 * 7)
-    public void getHierarchyJson() {
-        String json = webConnector.getResponse( wbApiPrefix + "/api/menu/getburger?includeBrands=False");
-        if (json.isEmpty()) {
-            siteDataRepo.save(new SiteData(new Date(), State.DOWNLOADING_ERROR, null));
-            logger.error("Hierarchy JSON downloading error.");
-        }
-        else {
-            siteDataRepo.save(new SiteData(new Date(), State.DOWNLOADED, json));
-            logger.info("Hierarchy JSON downloaded successfully.");
-        }
-    }
-
     @PostConstruct
     public void testCategoryDownload() {
         //rawDataRepo.save(new RawData(wbApiPrefix + "/api/catalog/sport/vidy-sporta/velosport", State.QUEUED));
-        rawDataRepo.save(new RawData(wbApiPrefix + "/api/catalog/aksessuary/avtotovary",
-                wbApiPrefix, State.QUEUED));
+        rawDataRepo.save(new RawData(wbApiPrefix + "/api/menu/getburger?includeBrands=False", wbApiPrefix, State.QUEUED));
+        rawDataRepo.save(new RawData(wbApiPrefix + "/api/catalog/aksessuary/avtotovary", wbApiPrefix, State.QUEUED));
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 250)
+    @Scheduled(fixedDelay = 500)
     public void getCategoryJson() {
         var rawDataList = rawDataRepo.findAndLockByState(State.QUEUED, PageRequest.of(0, 1));
         if (rawDataList.isEmpty())
@@ -79,15 +63,20 @@ public class JsonDownloader {
         }
     }
 
-    @Transactional
-    @Scheduled(fixedDelay = 1000 * 30)
+    // TODO extract next methods to another service (or set different schedule?)
+    //@Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
     public void setProductsForTS() {
         var products = productDataRepository.findAll();
-        if (products.isEmpty() || products.size() < 100) // size limit is for testing
+        if (products.isEmpty())
             return;
         products.forEach(product -> rawDataRepo
                 .save(new RawData(wbQtyApiPrefix + product.getProductId().toString(), product.getCategoryUrl(), State.QUEUED)));
 
         logger.info(products.size() + " products queued for TS");
+    }
+
+    //@Scheduled(fixedDelay = 1000 * 60 * 60 * 24 * 7)
+    public void updateHierarchy() {
+        rawDataRepo.save(new RawData(wbApiPrefix + "/api/menu/getburger?includeBrands=False", wbApiPrefix, State.QUEUED));
     }
 }

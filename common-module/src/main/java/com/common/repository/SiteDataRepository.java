@@ -14,6 +14,6 @@ import java.util.List;
 @Repository
 public interface SiteDataRepository extends JpaRepository<SiteData, Date> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(value = "SELECT s FROM SiteData s WHERE s.state = ?1")
-    List<SiteData> findAndLockByState(State state);
+    @Query(value = "SELECT s FROM SiteData s")
+    List<SiteData> findAndLock();
 }
