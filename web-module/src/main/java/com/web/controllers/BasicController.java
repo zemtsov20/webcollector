@@ -4,6 +4,7 @@ import com.common.enums.State;
 import com.web.models.BasicStatistic;
 import com.web.models.DonutStatistic;
 import com.web.models.SubcategoryStatistic;
+import com.web.services.MenuService;
 import com.web.services.StatisticService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,11 +30,14 @@ public class BasicController {
     @Autowired
     StatisticService statisticService;
 
+    @Autowired
+    MenuService menuService;
+
     @GetMapping("/basic-statistics")
     public List<BasicStatistic> getBasicStatistics(@RequestParam(name="start") String start,
                                                    @RequestParam(name="end") String end,
                                                    @RequestParam(name="ref") String ref) throws ParseException {
-        return statisticService.getBasicStatistic(start, end, ref);
+        return statisticService.getBasicStatistic(start, end, ref.replace("/api/catalog/", ""));
     }
     @GetMapping("/subcategory-statistics")
     public List<SubcategoryStatistic> getFullStatistics(@RequestParam(name="start") String start,
@@ -43,6 +47,11 @@ public class BasicController {
     }
     @GetMapping("/donut-statistics")
     public List<DonutStatistic> getDonutStatistics(@RequestParam(name="ref") String ref) {
-        return statisticService.getDonutStatistic(ref);
+        return statisticService.getDonutStatistic(ref.replace("/api/catalog/", ""));
+    }
+
+    @GetMapping("/menu-json")
+    public String getMenuJson() {
+        return menuService.getMenuJson();
     }
 }

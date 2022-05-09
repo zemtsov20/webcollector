@@ -60,8 +60,14 @@ public class StatisticService {
         List<SubcategoryStatistic> subcategoryStatistics = new ArrayList<>();
         CategoryData categoryData = categoryDataRepo.findTopByPageUrl(categoryUrl);
         if (categoryData != null) {
-            for (var subcategoryData : categoryDataRepo.findAllByParentId(categoryData.getId())) {
-                subcategoryStatistics.add(new SubcategoryStatistic(getBasicStatistic(startDateStr, endDateStr, subcategoryData.getPageUrl()),
+            var subcategoryDataList = categoryDataRepo.findAllByParentId(categoryData.getId());
+            if (subcategoryDataList.isEmpty())
+                subcategoryStatistics.add(new SubcategoryStatistic(getBasicStatistic(startDateStr, endDateStr,
+                        categoryUrl.replace("/api/catalog/", "")),
+                        categoryData.getName()));
+            for (var subcategoryData : subcategoryDataList) {
+                subcategoryStatistics.add(new SubcategoryStatistic(getBasicStatistic(startDateStr, endDateStr,
+                        subcategoryData.getPageUrl().replace("/api/catalog/", "")),
                         subcategoryData.getName()));
             }
         }

@@ -16,4 +16,5 @@ public interface SiteDataRepository extends JpaRepository<SiteData, Date> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(value = "SELECT s FROM SiteData s")
     List<SiteData> findAndLock();
+
 }

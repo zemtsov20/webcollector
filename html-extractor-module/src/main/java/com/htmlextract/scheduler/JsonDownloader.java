@@ -36,7 +36,7 @@ public class JsonDownloader {
     @Autowired
     private ProductDataRepository productDataRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void testCategoryDownload() {
         //rawDataRepo.save(new RawData(wbApiPrefix + "/api/catalog/sport/vidy-sporta/velosport", State.QUEUED));
         rawDataRepo.save(new RawData(wbApiPrefix + "/api/menu/getburger?includeBrands=False", wbApiPrefix, State.QUEUED));
