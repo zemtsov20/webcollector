@@ -21,6 +21,10 @@ import java.util.*;
 
 import static com.common.utils.Constants.wbApiPrefix;
 
+/**
+ * Main parsing class
+ *
+ */
 @Component
 @RequiredArgsConstructor
 public class JsonParser {
@@ -44,10 +48,14 @@ public class JsonParser {
     @Autowired
     private SiteDataRepository siteDataRepo;
 
+    /**
+     * Every 100ms method locks 1 row from database,
+     * choosing parsing method and saves the result
+     *
+     */
     @Transactional
     @Scheduled(fixedDelay = 100)
     public void getInfoFromRawData() {
-        int count = 0;
         for (RawData rawData : rawDataRepo.findAndLockByState(State.DOWNLOADED, PageRequest.of(0, 1))) {
             String currentJson = rawData.getJson();
             String dataRef = rawData.getDataRef();
@@ -87,7 +95,6 @@ public class JsonParser {
                             rawDataRepo.saveAll(getCategoryPagesList(currentJson, dataRef));
                     } else {
                         logger.info("Added " + rawDataList.size() + " subcategories from " + rawData.getDataRef());
-                        count += rawDataList.size();
                     }
                     rawDataRepo.saveAll(rawDataList);
                     rawData.setState(State.PARSED);
@@ -97,18 +104,30 @@ public class JsonParser {
                     rawData.setState(State.PARSED);
                 }
             }
-            rawDataRepo.save(rawData);
             logger.info(rawData.getDataRef() + " parsed, state: " + rawData.getState());
+            if (rawData.getState() == State.PARSED)
+                rawDataRepo.delete(rawData);
         }
-        if (count > 0)
-            logger.info(count + " JSONs parsed successfully.");
     }
 
+    /**
+     * Validation of JSON
+     *
+     * @param currentJson JSON in String format
+     * @return Result of validation
+     */
     private boolean menuBurgerCheck(String currentJson) {
         // TODO check JSON
         return true;
     }
 
+    /**
+     * Gets all pages of category
+     *
+     * @param json JSON in String format to parse
+     * @param pageUrl Link to category
+     * @return List of all category pages in RawData object
+     */
     private List<RawData> getCategoryPagesList(String json, String pageUrl) {
         List<RawData> rawDataList = new ArrayList<>();
 
@@ -125,10 +144,16 @@ public class JsonParser {
         return rawDataList;
     }
 
+    /**
+     * Gets all subcategories from input category
+     *
+     * @param url Link to category
+     * @return List of all subcategories in RawData object
+     */
     private List<RawData> getCategoriesList(String url) {
         List<RawData> rawDataList = new ArrayList<>();
         CategoryData categoryData = categoryDataRepo
-                .findTopByPageUrl(url.replace(wbApiPrefix, ""));
+                .findTopByPageUrl(url.replace(wbApiPrefix, "")).orElse(null);
         if (categoryData != null && categoryData.hasChildren) {
             Queue<CategoryData> categoryDataQueue = new LinkedList<>();
             categoryDataQueue.add(categoryData);
@@ -145,6 +170,13 @@ public class JsonParser {
         return rawDataList;
     }
 
+    /**
+     * Gets all products links from category page JSON
+     *
+     * @param json JSON in String format to parse
+     * @param parentRef Link to category
+     * @return List of all subcategories in RawData object
+     */
     private List<RawData> getProductsFromJson(String json, String parentRef) {
         List<RawData> rawDataList = new ArrayList<>();
 
@@ -159,6 +191,12 @@ public class JsonParser {
         return rawDataList;
     }
 
+    /**
+     * Gets all categories from menu-burger JSON
+     *
+     * @param json JSON in String format to parse
+     * @return List of all categories in CategoryData object
+     */
     private List<CategoryData> getAllCategoriesFromMenu(String json) {
         List<CategoryData> dataList = new ArrayList<>();
         Gson gson = new Gson();

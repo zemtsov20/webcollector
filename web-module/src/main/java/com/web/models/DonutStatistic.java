@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DonutStatistic {
     private String brandName;
+
     private Long productCount;
 
     public DonutStatistic(SqlDonutStatistic sqlDonutStatistic) {

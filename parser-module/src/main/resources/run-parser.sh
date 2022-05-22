@@ -21,7 +21,7 @@ echo $! > save_pid.txt
 
 sleep 10
 
-kill $(cat save_pid.txt)
+#kill "$(cat save_pid.txt)"
 rm save_pid.txt
 
 #PROXY_PORT=34512

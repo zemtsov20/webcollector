@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CategoryDataRepository extends JpaRepository<CategoryData, Long> {
     List<CategoryData> findAllByParentId(Long parentId);
 
-    CategoryData findTopByPageUrl(String pageUrl);
+    Optional<CategoryData> findTopByPageUrl(String pageUrl);
 }

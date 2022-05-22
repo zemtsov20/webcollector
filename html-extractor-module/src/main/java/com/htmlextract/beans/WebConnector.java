@@ -10,24 +10,32 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Class for downloading info by link
+ */
 @Component
 @NoArgsConstructor
 public class WebConnector {
+    /**
+     * Downloading info by input link
+     * @param url Link to prepare
+     * @return Result in String format
+     */
     public String getResponse(String url) {
+//        try {
+//            Thread.sleep((long) (Math.random() * 100));
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        String content = "";
         try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        String htmlContent = "";
-        try {
-            htmlContent = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
+            content = IOUtils.toString(new URL(url), StandardCharsets.UTF_8);
         } catch (MalformedURLException e) {
             System.out.println("Wrong url! " + e.getMessage() + " for url " + url);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
-        return htmlContent;
+        return content;
     }
 }

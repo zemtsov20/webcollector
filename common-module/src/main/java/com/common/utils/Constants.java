@@ -1,5 +1,8 @@
 package com.common.utils;
 
+/**
+ * Class with constant variables
+ */
 public class Constants {
     public static final String wbApiPrefix = "https://napi.wildberries.ru";
 

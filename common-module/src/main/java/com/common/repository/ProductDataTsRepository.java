@@ -12,10 +12,8 @@ import java.util.List;
 public interface ProductDataTsRepository extends JpaRepository<ProductDataTs, Long> {
     List<ProductDataTs> findAllByTakenInBetweenAndProductId(Date start, Date end, Long productId);
 
-    @Query("SELECT avg(price)" +
-            "FROM ProductDataTs " +
-            "WHERE takenIn > ?1 AND takenIn < ?2 AND productId IN ?3 ")
-    Double findAvgPriceByProductIdsBetweenDate(Date start, Date end, List<Long> ids);
+    @Query("SELECT p FROM ProductDataTs p WHERE p.takenIn > ?1 AND p.takenIn < ?2 AND p.productId IN ?3 ORDER BY p.productId, p.takenIn")
+    List<ProductDataTs> findByProductIdsBetweenDate(Date start, Date end, List<Long> ids);
 
     @Query("SELECT avg(quantity)" +
             "FROM ProductDataTs " +

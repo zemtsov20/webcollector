@@ -11,5 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SubcategoryStatistic {
     private List<BasicStatistic> statistics;
+
     private String categoryUrl;
+
 }

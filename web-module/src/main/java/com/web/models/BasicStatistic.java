@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class BasicStatistic {
-    private String averagePrice;
+    private String earnings;
 
     private String period;
 
-    private String goodsCount;
+    private String salesCount;
 
 }
